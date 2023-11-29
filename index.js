@@ -1,15 +1,15 @@
+import fs from "fs"
 import net from "net"
 
 const blockList = new net.BlockList()
 blockList.addAddress("192.168.0.34")
-console.log(blockList.check("123.123.123.123"))
 
 const server = net.createServer()
 const port = 8080
 
 server.listen(
   {
-    host: "10.180.18.205",
+    host: "172.20.10.2",
     port: port,
   },
   () => {
@@ -29,17 +29,37 @@ server.on("connection", (stream) => {
   const alias = resolveClient(clientIP)
   console.log("Client connected")
 
-  
-
   stream.on("data", (data) => {
     console.log(`Received data from ${alias}:  ${data}`)
 
     const responseData = `${data}`
-    stream.write(responseData)
+
+    if (data.toString().includes("/read")) {
+      const filename = data.toString().slice(5).trim()
+
+      // Check if the file exists
+      fs.access(`./files/${filename}`, fs.constants.F_OK, (err) => {
+        if (err) {
+          console.log(err)
+          stream.write("File not found")
+          return
+        }
+      })
+      // File exists, read its content
+
+      try {
+        var content = fs.readFileSync(`./files/${filename}`, "utf8")
+        stream.write(content)
+      } catch (err) {
+        console.log(err)
+      }
+    } else {
+      stream.write(responseData)
+    }
   })
 
   stream.on("close", (data) =>
-    console.log(`connection closed: ${clientAddress}` + "\n")
+    console.log(`connection closed: ${alias}` + "\n")
   )
 
   stream.on("error", (err) => console.log(`Error: ${err}`))
