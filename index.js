@@ -34,6 +34,9 @@ server.on("connection", (stream) => {
 
     const responseData = `${data}`
 
+    var splitCommand = data.split(" ");
+    var command = splitCommand[0];
+
     if (data.toString().includes("/read")) {
       const filename = data.toString().slice(5).trim()
 
@@ -53,9 +56,35 @@ server.on("connection", (stream) => {
       } catch (err) {
         console.log(err)
       }
-    } else {
+    } else if (command == "/write" && checkPermission()) {
+  
+        var file = splitCommand[1];
+        var content = splitCommand.slice(2).join(" ");
+
+        // Check if the file exists
+        fs.access(file, fs.constants.F_OK, (err) => {
+          if (err) {
+            stream.write(`\nFile ${file} does not exist! Content not written.`);
+          } else {
+            // File exists, proceed with writing content
+            fs.writeFile(file, content, { flag: "a+" }, (error) => {
+              if (error) {
+                stream.write(`\nAn error happened, content not written to file.
+                \n The error that happened:
+                \n ${error}`);
+              } else {
+                stream.write("\nFile content UPDATED!");
+              }
+            });
+          }
+        });
+    } 
+    
+    else {
       stream.write(responseData)
     }
+
+
   })
 
   stream.on("close", (data) =>
