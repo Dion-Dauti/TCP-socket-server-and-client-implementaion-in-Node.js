@@ -116,6 +116,31 @@ server.on("connection", (stream) => {
             console.log(err);
         }
       }
+        else if (action == "del"){
+        try{
+          fs.access(`./files/${fileName}`, fs.constants.F_OK, (err) =>{
+            if(err){
+              stream.write(`File ${fileName} doesn't exist on server!`)
+              return;
+            }
+            else{
+              fs.unlink(`./files/${fileName}`, (err) => {
+                if (err) {
+                  console.error(`Error deleting file ${fileName}: ${err.message}`);
+                  stream.write(`Error deleting file ${fileName}: ${err.message}`);
+                } else {
+                  console.log(`File ${fileName} has been deleted.`);
+                  stream.write(`File ${fileName} has been deleted.`);
+                }
+              });
+            }
+          })
+          
+        }
+        catch(err){
+          console.log(err);
+        }
+      }
       else{
         stream.write("Invalid command! \r\nType /help to see server commands!");
       }
