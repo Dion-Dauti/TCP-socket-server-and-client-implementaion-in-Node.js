@@ -88,6 +88,38 @@ server.on("connection", (stream) => {
         console.log(err)
       }
     } 
+      else if(data.includes("/exec")){
+      const fileName = data.toString().split(/\s+/)[1];
+      const action = data.toString().split(/\s+/)[2];
+      if(action == "new"){
+        try {
+          // Check if file exists
+          fs.promises.access(`./files/${fileName}`, fs.constants.F_OK)
+              .then(() => stream.write(`File ${fileName} exists!`))
+              .catch(() => {
+                fs.access(`./files/${fileName}`, fs.constants.F_OK, (err) => {
+                  if(err){
+                    fs.writeFile(`./files/${fileName}`, "", (err) => {
+                      if (err) {
+                        console.log(err);
+                        stream.write(`Error creating file ${fileName}`);
+                        return;
+                      } 
+                      else {
+                        stream.write(`File ${fileName} created!`);
+                      }
+                    });
+                  }
+              })
+            });
+         } catch(err) {
+            console.log(err);
+        }
+      }
+      else{
+        stream.write("Invalid command! \r\nType /help to see server commands!");
+      }
+    }
     else if(data == "/help"){
       stream.write("\r\n"+"Type /read [file name.txt] -> To read from a file! " +
                     "\r\n"+"Type /write [file name.txt] [content] -> To write in a file! " +
