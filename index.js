@@ -126,7 +126,7 @@ const knownClients = [
   {
     id: 3,
     ip: "192.168.1.14",
-    name: "Diona",
+    name: "Diona Muçiqi",
     readPremission: false,
     writePremission: true,
     executePremission: false,
