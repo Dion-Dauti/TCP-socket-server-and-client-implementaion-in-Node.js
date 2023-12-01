@@ -65,23 +65,23 @@ server.on("connection", (stream) => {
       var content = "\r\n" + splitCommand.slice(2).join(" ");
       try {
        // Check if the file exists
-      fs.access(`./files/${filename}`, fs.constants.F_OK, (err) => {
-        if (err) {
-          console.log(err);
-          stream.write("File not found");
-          return;
-        }
-
-        // File exists, update its content
-        fs.writeFile(`./files/${filename}`, content, { flag: "a+" }, (error) => {
-          if (error) {
-            console.log(error);
-            stream.write("Error updating file content!");
-          } else {
-            stream.write("\nFile content UPDATED!");
+        fs.access(`./files/${filename}`, fs.constants.F_OK, (err) => {
+          if (err) {
+            console.log(err);
+            stream.write("File not found");
+            return;
           }
+
+          // File exists, update its content
+          fs.writeFile(`./files/${filename}`, content, { flag: "a+" }, (error) => {
+            if (error) {
+              console.log(error);
+              stream.write("Error updating file content!");
+            } else {
+              stream.write("\nFile content UPDATED!");
+            }
+          });
         });
-      });
 
       } catch (err) {
         stream.write("An error happened, try again!")
@@ -91,11 +91,11 @@ server.on("connection", (stream) => {
     else if(data == "/help"){
       stream.write("\r\n"+"Type /read [file name.txt] -> To read from a file! " +
                     "\r\n"+"Type /write [file name.txt] [content] -> To write in a file! " +
-                    "\r\n"+"Type /exec [file name.txt] [action] -> (Actions: new - create new file, del - delete file, run - execute a file)! ");
+                    "\r\n"+"Type /exec [file name.txt] [action] -> (Actions: new - create new file, del - delete file, run - open a file)! ");
     }
     else {
       stream.write(responseData)
-      stream.write("\r\n"+"Write /help to see server commands!")
+      stream.write("\r\n"+"Type /help to see server commands!")
     }
   })
 
