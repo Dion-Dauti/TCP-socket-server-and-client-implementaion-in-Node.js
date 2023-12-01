@@ -3,7 +3,7 @@ import promptSync from "prompt-sync";
 const prompt = promptSync();
 
 const client = new net.Socket();
-const serverHost = "172.20.10.5";
+const serverHost = "10.180.24.178";
 const serverPort = 8080;
 
 client.connect(serverPort, serverHost, () => {
@@ -19,13 +19,8 @@ function handleUserInput() {
 
 // Set up event listeners
 client.on("data", (data) => {
-    // Handle user input after receiving data
-    if(data == "/help"){
-      console.log("Type /read [file name.txt] -> To read from a file! ");
-      console.log("Type /write [file name.txt] [content] -> To write in a file! ");
-      console.log("Type /exec [file name.txt] [action] -> (Actions: new - create new file, del - delete file, run - execute a file)! ");
-    }
     console.log(`Received from server: ${data}`);
+    // Handle user input after receiving data
     if(data != "exit"){
       handleUserInput();
     }

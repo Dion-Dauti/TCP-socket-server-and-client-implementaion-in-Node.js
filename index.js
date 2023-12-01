@@ -9,7 +9,7 @@ const port = 8080
 
 server.listen(
   {
-    host: "172.20.10.2",
+    host: "10.180.24.178",
     port: port,
   },
   () => {
@@ -31,14 +31,16 @@ server.on("connection", (stream) => {
 
   stream.on("data", (data) => {
     console.log(`Received data from ${alias}:  ${data}`)
-
+    if(data.toString().toLowerCase() == "exit"){
+      stream.end("Press [ENTER] to close the connection!")
+    }
     const responseData = `${data}`
 
     var splitCommand = data.split(" ");
-    var command = splitCommand[0];
+    // var command = splitCommand[0];
 
     if (data.toString().includes("/read")) {
-      const filename = data.toString().slice(5).trim()
+      const filename = data.toString().split(/\s+/)[1]
 
       // Check if the file exists
       fs.access(`./files/${filename}`, fs.constants.F_OK, (err) => {
@@ -56,39 +58,49 @@ server.on("connection", (stream) => {
       } catch (err) {
         console.log(err)
       }
-    } else if (command == "/write" && checkPermission()) {
-  
-        var file = splitCommand[1];
-        var content = splitCommand.slice(2).join(" ");
+    }
+    else if (data.toString().includes("/write")) {
+      // ne komand marrim emrin e fajllit
+      const filename = data.toString().split(/\s+/)[1];
+      var content = "\r\n" + splitCommand.slice(2).join(" ");
+      try {
+       // Check if the file exists
+      fs.access(`./files/${filename}`, fs.constants.F_OK, (err) => {
+        if (err) {
+          console.log(err);
+          stream.write("File not found");
+          return;
+        }
 
-        // Check if the file exists
-        fs.access(file, fs.constants.F_OK, (err) => {
-          if (err) {
-            stream.write(`\nFile ${file} does not exist! Content not written.`);
+        // File exists, update its content
+        fs.writeFile(`./files/${filename}`, content, { flag: "a+" }, (error) => {
+          if (error) {
+            console.log(error);
+            stream.write("Error updating file content!");
           } else {
-            // File exists, proceed with writing content
-            fs.writeFile(file, content, { flag: "a+" }, (error) => {
-              if (error) {
-                stream.write(`\nAn error happened, content not written to file.
-                \n The error that happened:
-                \n ${error}`);
-              } else {
-                stream.write("\nFile content UPDATED!");
-              }
-            });
+            stream.write("\nFile content UPDATED!");
           }
         });
+      });
+
+      } catch (err) {
+        stream.write("An error happened, try again!")
+        console.log(err)
+      }
     } 
-    
+    else if(data == "/help"){
+      stream.write("\r\n"+"Type /read [file name.txt] -> To read from a file! " +
+                    "\r\n"+"Type /write [file name.txt] [content] -> To write in a file! " +
+                    "\r\n"+"Type /exec [file name.txt] [action] -> (Actions: new - create new file, del - delete file, run - execute a file)! ");
+    }
     else {
       stream.write(responseData)
+      stream.write("\r\n"+"Write /help to see server commands!")
     }
-
-
   })
 
   stream.on("close", (data) =>
-    console.log(`connection closed: ${alias}` + "\n")
+    console.log(`connection closed by ${alias}` + "\n")
   )
 
   stream.on("error", (err) => console.log(`Error: ${err}`))
