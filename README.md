@@ -10,3 +10,10 @@
 - Reads and writes to files
 - Creates new files and executes scripts
 - Responds with help instructions upon client request
+
+## Contributors
+
+- Dion Kastrati
+- Dion Dauti
+- Diona Muçiqi
+- Dominik Pllashniku
