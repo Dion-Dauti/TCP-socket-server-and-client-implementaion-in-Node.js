@@ -9,11 +9,11 @@ export const knownClients = [
   },
   {
     id: 2,
-    ip: "10.180.21.251",
+    ip: "172.20.10.5",
     name: "Dion Kastrati",
     readPermission: true,
     writePermission: true,
-    executePermission: false,
+    executePermission: true,
   },
   {
     id: 3,

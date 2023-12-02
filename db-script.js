@@ -23,8 +23,9 @@ connection.connect((err) => {
 
 knownClients.forEach((data) => {
   connection.query(
-    "INSERT INTO clients(ip, name, readPremission, writePremission, executePremission) VALUES (?, ?, ?, ?, ?)",
+    "INSERT INTO clients(id,ip, name, readPremission, writePremission, executePremission) VALUES (?,?, ?, ?, ?, ?)",
     [
+      Math.floor(Math.random()*100000),
       data.ip,
       data.name,
       data.readPermission,
@@ -43,6 +44,6 @@ connection.end((err) => {
   if (err) {
     console.error("Error closing database connection:", err)
   } else {
-    console.log("Connection closed")
+    setTimeout(() => console.log("Connection closed"), 500)
   }
 })
