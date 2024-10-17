@@ -1,6 +1,7 @@
 import net from "net"
+import './server.js';
 import promptSync from "prompt-sync"
-import { ipAddr } from "./server"
+import { ipAddr } from "./server.js"
 
 const prompt = promptSync()
 
