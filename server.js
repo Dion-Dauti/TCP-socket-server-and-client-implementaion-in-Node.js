@@ -2,20 +2,36 @@ import fs, { readFile } from "fs"
 import net from "net"
 import { exec } from "child_process"
 import { knownClients, resolveClient } from "./clientList.js"
+import dns from 'node:dns';
+import os from 'node:os';
 
 const blockList = new net.BlockList()
 blockList.addAddress("172.20.10.10")
 
 const server = net.createServer()
-const port = 8080
+const port = 8080;
+
+const ip_addr_func = ()=>{
+
+    const options = { family: 4 };
+    dns.lookup(os.hostname(), options, (err, addr) => {
+      if (err) {
+        console.error(err);
+      } else {
+        return addr;
+      }
+    });
+}
+
+export const ipAddr = ip_addr_func();
 
 server.listen(
   {
-    host: "172.20.10.2",
+    host: ipAddr,
     port: port,
   },
   () => {
-    console.log(`Server is setup on port ${port}`)
+    console.log(`Server is listening on port ${port}`)
   }
 )
 

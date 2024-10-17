@@ -1,9 +1,11 @@
 import net from "net"
 import promptSync from "prompt-sync"
+import { ipAddr } from "./server"
+
 const prompt = promptSync()
 
 const client = new net.Socket()
-const serverHost = "172.20.10.2"
+const serverHost = ipAddr
 const serverPort = 8080
 
 client.connect(serverPort, serverHost, () => {
